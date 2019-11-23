@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+	<context:component-scan base-package="com.xmc">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	
+	<bean id="userDaoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+	 	<property name="mapperInterface" value="com.xmc.mapper.UserDaoMapper"></property>
+	 	<property name="sqlSessionFactory" ref="sqlSessionFacotry"></property>
+	 </bean>
+	 
+	 <bean id="codeDaoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+	 	<property name="mapperInterface" value="com.xmc.mapper.CodeDaoMapper"></property>
+	 	<property name="sqlSessionFactory" ref="sqlSessionFacotry"></property>
+	 </bean>
+	
+	<!-- 加载db.properties文件 -->
+	<bean  id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<property name="locations">
+			<array>
+				<value>classpath:db.properties</value>
+			</array>
+		
+		</property>
+	</bean>
+	
+	<!-- 配置配置数据库信息（替代mybatis的配置文件conf.xml） -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+			<property name="driverClassName" value="${driver}"></property>
+			<property name="url" value="${url}"></property>
+			<property name="username" value="${username}"></property>
+			<property name="password" value="${password}"></property>
+	</bean>
+	
+	<!-- 在SpringIoc容器中 创建MyBatis的核心类 SqlSesionFactory -->
+	<bean id="sqlSessionFacotry" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 加载mybatis配置文件 
+			<property name="configLocation" value="classpath:conf.xml"></property>
+		-->
+		<property name="typeAliasesPackage" value="com.xmc.pojo"></property>
+		<!-- 加载mapper.xml路径 -->
+		<property name="mapperLocations" value="classpath*:com/xmc/mapper/*.xml"></property>
+		
+	</bean>
+	
+</beans>
